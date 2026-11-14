@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, STAGES } from "../api.js";
 import { Alert, Spinner, fmtDate, fmtDateTime } from "../components/ui.jsx";
+import ChangePasswordModal from "../components/ChangePasswordModal.jsx";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const [pwOpen, setPwOpen] = useState(false);
+  const [notice, setNotice] = useState("");
 
   useEffect(() => { api("/api/dashboard").then(setData).catch((e) => setError(e.message)); }, []);
 
@@ -19,8 +22,19 @@ export default function Dashboard() {
     <div className="stack-lg">
       <div className="page-head">
         <h1>Job-hunt dashboard</h1>
-        <Link className="btn primary" to="/match">Run an AI match</Link>
+        <div className="row">
+          <button className="btn" onClick={() => { setNotice(""); setPwOpen(true); }}>Change password</button>
+          <Link className="btn primary" to="/match">Run an AI match</Link>
+        </div>
       </div>
+
+      <Alert kind="success" onClose={() => setNotice("")}>{notice}</Alert>
+      {pwOpen && (
+        <ChangePasswordModal
+          onClose={() => setPwOpen(false)}
+          onDone={() => { setPwOpen(false); setNotice("Password updated."); }}
+        />
+      )}
 
       {empty && (
         <div className="card empty">
